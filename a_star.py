@@ -18,22 +18,35 @@ class Field:
 		return line
 
 
-	def empty_position(self):
+	def get_empty_position(self):
 		for i, arr in enumerate(self.field):
 			for j, el in enumerate(arr):
 				if el == None:
 					return [i, j]
 
+	def get_imbalance(self):
+		counter, imbalance = 1, 0
+		for row in range(self.size):
+			for col in range(self.size):
+				if counter != self.field[row][col]:
+					if self.field[row][col] is not None:
+						imbalance += 1
+				counter += 1
+		return imbalance
+
 
 class Control:
 
-	def __init__(self, field):
-		self.field = field.field
-		self.empty = field.empty_position()
+	def __init__(self, size = 3):
+		self.table = Field(size)
 		self.l = -1
 		self.r = 1
 		self.u = -1
 		self.d = 1
+
+		
+		self.imbalance = self.table.get_imbalance()
+		self.empty = self.table.get_empty_position()
 
 
 	def can_move(self, action):
@@ -57,8 +70,8 @@ class Control:
 		row1, row2 = pos1[0], pos2[0]
 		col1, col2 = pos1[1], pos2[1]
 
-		self.field[row1][col1], self.field[row2][col2] = self.field[row2][col2], self.field[row1][col1]
-		self.empty = [row2, col2]
+		self.table.field[row1][col1], self.table.field[row2][col2] = self.table.field[row2][col2], self.table.field[row1][col1]
+		self.empty = pos2
 
 
 
@@ -66,31 +79,31 @@ class Control:
 		if self.can_move('left'):
 			neighbor = [self.empty[0], self.empty[1] + self.l]
 			self.swap(self.empty, neighbor)
-		return self.field
+		return self.table.field
 
 
 	def right(self):
 		if self.can_move('right'):
 			neighbor = [self.empty[0], self.empty[1] + self.r]
 			self.swap(self.empty, neighbor)
-		return self.field
+		return self.table.field
 
 
 	def up(self):
 		if self.can_move('up'):
 			neighbor = [self.empty[0] + self.u, self.empty[1]]
 			self.swap(self.empty, neighbor)
-		return self.field
+		return self.table.field
 
 
 	def down(self):
 		if self.can_move('down'):
 			neighbor = [self.empty[0] + self.d, self.empty[1]]
 			self.swap(self.empty, neighbor)
-		return self.field
+		return self.table.field
 
 	def print(self):
-		for i in self.field:
+		for i in self.table.field:
 			print(i)
 		print('---------')
 
@@ -98,6 +111,8 @@ class Control:
 class Node:
 
 	def __init__(self, field, parent = None):
+		self.grade = 0
+		self.weight = 0
 		self.field = field
 		self.parent = parent
 		self.children = list()
@@ -118,9 +133,7 @@ class Node:
 class Game:
 
 	def __init__(self, size = 3):
-		self.size = size
-		field = Field(size)
-		self.joystick = Control(field)
+		self.joystick = Control(size)
 
 
 def move(joystick, action):
@@ -135,13 +148,23 @@ def move(joystick, action):
 		return joystick.down()
 
 
-#def a_star(node):
-
 
 
 if __name__ == '__main__':
 
 	game = Game()
-	#root = Node(game)
-
-	#a_star(root)
+	game.joystick.print()
+	game.joystick.left()
+	game.joystick.print()
+	game.joystick.right()
+	game.joystick.print()
+	game.joystick.up()
+	game.joystick.print()
+	game.joystick.up()
+	game.joystick.print()
+	game.joystick.down()
+	game.joystick.print()
+	game.joystick.down()
+	game.joystick.print()
+	game.joystick.down()
+	game.joystick.print()
